@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="Maria victoria">
+  <title>Asignación de técnico | PEST CONTROL</title>
+  <link rel="icon" href="img/logo.png">
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body data-rol="admin" data-menu="asignacion">
+  La barra superior, el menú lateral y la navegación inferior los crea js/app.js según el rol
+  <main class="contenido" id="contenido">
+
+    <div class="encabezado-pagina">
+      <div>
+        <h1>Asignación de técnico — HU-04 / RF11</h1>
+        <p>Agenda semanal de los técnicos. Arrastra las órdenes para asignarlas o pasarlas a otro técnico o a otro día.</p>
+      </div>
+      
+    </div>
+
+    <section class="tarjeta" id="asig-contenido">
+      <div class="asig-cabecera">
+        <div class="campo" style="margin:0;flex:1;min-width:240px" id="caja-pendientes">
+          <label for="asig-ods">Orden pendiente por asignar</label>
+          <select id="asig-ods"></select>
+        </div>
+        <div class="orden-pendiente" id="asig-resumen" aria-live="polite"></div>
+      </div>
+
+      <p class="ayuda-arrastre">✋ <strong>Arrastra</strong> una orden a otra casilla para cambiar de técnico o de día (para otra semana, mantenla sobre ◀ o ▶). También puedes <strong>hacer clic o tocar</strong> la orden para elegir cualquier fecha.</p>
+
+      <div class="nav-semana">
+        <button type="button" class="btn btn-secundario btn-chico" id="semana-anterior" aria-label="Semana anterior">◀ Anterior</button>
+        <h2 id="titulo-semana" style="margin:0"></h2>
+        <button type="button" class="btn btn-secundario btn-chico" id="semana-siguiente" aria-label="Semana siguiente">Siguiente ▶</button>
+      </div>
+      <div style="text-align:center;margin:-.4rem 0 .6rem"><button type="button" class="btn btn-secundario btn-chico" id="semana-hoy">Ir a esta semana</button></div>
+      <p class="pista-semana">⏩ Mantén la orden sobre <strong>◀ Anterior</strong> o <strong>Siguiente ▶</strong> para pasar a otra semana sin soltarla.</p>
+
+      <div class="calendario-contenedor">
+        <div class="calendario" id="calendario"></div>
+      </div>
+
+      <div class="leyenda" aria-label="Convenciones">
+        <span><i class="punto dia-orden"></i> Día programado de la orden pendiente</span>
+        <span><i class="punto programado"></i> Programado (se puede mover)</span>
+        <span><i class="punto en-ejecucion"></i> En ejecución</span>
+        <span><i class="punto completado"></i> Completado</span>
+        <span>⭐ Recomendado</span>
+        <span>⚠️ Cruce de horario</span>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal" id="modal-mover" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-mover">
+    <div class="modal-caja">
+      <div class="modal-cabecera">
+        <h2 id="titulo-modal-mover">Mover orden</h2>
+        <button type="button" data-cerrar="modal-mover" aria-label="Cerrar">&times;</button>
+      </div>
+      <form class="modal-cuerpo" id="form-mover" novalidate>
+        <p class="ayuda" id="mover-resumen" style="margin-bottom:.9rem"></p>
+        <input type="hidden" id="mover-ods">
+        <div class="campo">
+          <label for="mover-tecnico">Técnico <span class="obligatorio" aria-hidden="true">*</span></label>
+          <select id="mover-tecnico" required></select>
+          <p class="mensaje-error"></p>
+        </div>
+        <div class="fila-campos">
+        <div class="campo">
+          <label for="mover-fecha">Fecha <span class="obligatorio" aria-hidden="true">*</span></label>
+          <input type="date" id="mover-fecha" required>
+          <p class="mensaje-error"></p>
+        </div>
+        <div class="campo">
+          <label for="mover-hora">Hora <span class="obligatorio" aria-hidden="true">*</span></label>
+          <input type="time" id="mover-hora" required>
+          <p class="mensaje-error"></p>
+        </div>
+        </div>
+        <p class="cruce" id="mover-cruce" hidden></p>
+        <div class="modal-pie">
+          <button type="button" class="btn btn-secundario" data-cerrar="modal-mover">Cancelar</button>
+          <button type="submit" class="btn btn-primario">Guardar cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/datos.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

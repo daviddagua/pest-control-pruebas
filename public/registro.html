@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="David Liz Dagua">
+  <title>Crear cuenta | PEST CONTROL</title>
+  <link rel="icon" href="img/logo.png">
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body class="acceso">
+
+  <!-- Registro de usuario interno (EV01) -->
+  <main class="acceso-caja">
+    <div class="acceso-cabecera">
+      <img src="img/logo.png" alt="Logo de PEST CONTROL">
+      <span class="marca-texto">PEST <span>CONTROL</span></span>
+      <h1>Crear cuenta</h1>
+      <p class="ayuda">Completa los siguientes datos para registrarte</p>
+    </div>
+
+    <div class="acceso-cuerpo">
+      <div class="alerta-form" id="alerta-registro" role="alert"></div>
+
+      <form id="form-registro" novalidate>
+        <div class="campo">
+          <label for="reg-correo">Correo electrónico <span class="obligatorio" aria-hidden="true">*</span></label>
+          <input type="email" id="reg-correo" autocomplete="email" required>
+          <p class="mensaje-error"></p>
+        </div>
+        <div class="campo">
+          <label for="reg-nombre">Nombre completo <span class="obligatorio" aria-hidden="true">*</span></label>
+          <input type="text" id="reg-nombre" autocomplete="name" required>
+          <p class="mensaje-error"></p>
+        </div>
+        <div class="fila-campos">
+          <div class="campo">
+            <label for="reg-documento">Cédula <span class="obligatorio" aria-hidden="true">*</span></label>
+            <input type="text" id="reg-documento" inputmode="numeric" data-tipo="documento" required>
+            <p class="mensaje-error"></p>
+          </div>
+          <div class="campo">
+            <label for="reg-telefono">Número de teléfono <span class="obligatorio" aria-hidden="true">*</span></label>
+            <input type="tel" id="reg-telefono" inputmode="numeric" data-tipo="telefono" required>
+            <p class="mensaje-error"></p>
+          </div>
+        </div>
+        <div class="campo">
+          <label for="reg-clave">Contraseña <span class="obligatorio" aria-hidden="true">*</span></label>
+          <input type="password" id="reg-clave" autocomplete="new-password" data-tipo="clave" required aria-describedby="ayuda-clave">
+          <small id="ayuda-clave">Mínimo 6 caracteres, con letras y números.</small>
+          <p class="mensaje-error"></p>
+        </div>
+        <div class="campo">
+          <label for="reg-clave2">Confirmar contraseña <span class="obligatorio" aria-hidden="true">*</span></label>
+          <input type="password" id="reg-clave2" autocomplete="new-password" data-igual="reg-clave" required>
+          <p class="mensaje-error"></p>
+        </div>
+
+        <label class="casilla">
+          <input type="checkbox" id="reg-datos">
+          Autorizo el tratamiento de mis datos personales (Ley 1581 de 2012).
+        </label>
+
+        <button type="submit" class="btn btn-primario btn-bloque">Registrarme</button>
+      </form>
+
+      <div class="acceso-enlaces">
+        <p>¿Ya tienes una cuenta? <a href="index.html"><strong>Inicia sesión</strong></a></p>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/datos.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/acceso.js"></script>
+</body>
+</html>

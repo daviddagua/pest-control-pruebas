@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="David Liz Dagua">
+  <title>Servicios y visitas | PEST CONTROL</title>
+  <link rel="icon" href="img/logo.png">
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body data-rol="cliente" data-menu="servicios">
+La barra superior, el menú lateral y la navegación inferior los crea js/app.js según el rol
+  <main class="contenido" id="contenido">
+
+    <div class="encabezado-pagina"><div><h1>Servicios y visitas</h1><p>Tus visitas programadas y el historial de servicios realizados.</p></div></div>
+    <section class="tarjeta">
+      <h2>Próximas visitas</h2>
+      <ul class="lista" id="lista-proximas-cliente"></ul>
+    </section>
+    <section class="tarjeta">
+      <h2>Historial</h2>
+      <div class="tabla-contenedor">
+        <table>
+          <thead><tr><th scope="col">N° ODS</th><th scope="col">Fecha</th><th scope="col">Servicio</th><th scope="col">Área</th><th scope="col">Técnico</th><th scope="col">Estado</th></tr></thead>
+          <tbody id="tabla-servicios-cliente"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+
+  <script src="js/datos.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/certificado.js"></script>
+  <script src="js/cliente.js"></script>
+</body>
+</html>

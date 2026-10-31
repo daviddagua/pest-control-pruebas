@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="David Liz Dagua">
+  <title>Certificados | PEST CONTROL</title>
+  <link rel="icon" href="img/logo.png">
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body data-rol="cliente" data-menu="certificados">
+  <!-- La barra superior, el menú lateral y la navegación inferior los crea js/app.js según el rol -->
+  <main class="contenido" id="contenido">
+
+    <div class="encabezado-pagina"><div><h1>Certificados de servicio</h1><p>Consulte y descargue los certificados enviados a su correo tras cada servicio.</p></div></div>
+    <section class="tarjeta">
+      <div class="tabla-contenedor">
+        <table>
+          <thead><tr><th scope="col">N° ODS</th><th scope="col">Fecha</th><th scope="col">Servicio</th><th scope="col">Estado</th><th scope="col"><span class="oculto">Acciones</span></th></tr></thead>
+          <tbody id="tabla-cert-cliente"></tbody>
+        </table>
+      </div>
+      <p class="nota-info">Los certificados se generan y envían automáticamente al correo registrado al finalizar cada servicio, firmados por el técnico y por la persona que recibió la visita.</p>
+    </section>
+  </main>
+
+
+  <script src="js/datos.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/certificado.js"></script>
+  <script src="js/cliente.js"></script>
+</body>
+</html>

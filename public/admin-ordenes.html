@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="David Liz Dagua">
+  <title>Servicios (Órdenes) | PEST CONTROL</title>
+  <link rel="icon" href="img/logo.png">
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body data-rol="admin" data-menu="ordenes">
+  La barra superior, el menú lateral y la navegación inferior los crea js/app.js según el rol
+  <main class="contenido" id="contenido">
+
+    Lista de órdenes 
+    <div id="lista-ordenes">
+    <div class="encabezado-pagina">
+      <div>
+        <h1>Servicios (Órdenes)</h1>
+        <p>Consulta, filtra y crea órdenes de servicio (HU-03, RF10).</p>
+      </div>
+      <button class="btn btn-primario" id="btn-nueva-ods">+ Nueva orden (ODS)</button>
+    </div>
+
+      <section class="tarjeta">
+        <div class="herramientas">
+          <label for="buscar-orden" class="oculto">Buscar orden</label>
+          <input type="search" id="buscar-orden" placeholder="🔍 Buscar por N° ODS, cliente o servicio">
+          <label for="filtro-estado" class="oculto">Filtrar por estado</label>
+          <select id="filtro-estado"></select>
+        </div>
+      <div class="tabla-contenedor">
+        <table>
+          <thead><tr><th scope="col">N° ODS</th><th scope="col">Cliente</th><th scope="col">Servicios</th><th scope="col">Fecha programada</th><th scope="col">Técnico</th><th scope="col">Estado</th><th scope="col">Acciones</th></tr></thead>
+          <tbody id="tabla-ordenes"></tbody>
+        </table>
+      </div>
+      </section>
+    </div>
+
+     Registro de cliente y creación de ODS 
+    <section id="nueva" hidden>
+    <div class="encabezado-pagina">
+      <div>
+        <h1 id="titulo-form-ods">Nueva orden de servicio (ODS)</h1>
+        <p id="sub-form-ods">Registre el cliente (si es nuevo), los servicios a realizar y los productos que usará el técnico.</p>
+      </div>
+    </div>
+      <form class="tarjeta" id="form-ods" novalidate>
+        <div class="dos-columnas">
+          <fieldset style="border:none">
+            <h3>Datos del cliente — HU-01</h3>
+            <div class="campo">
+              <label for="ods-cliente-existente">Cliente <span class="obligatorio" aria-hidden="true">*</span></label>
+              <select id="ods-cliente-existente" required></select>
+              <small>Elige un cliente registrado o la opción “Registrar cliente nuevo”.</small>
+              <p class="mensaje-error"></p>
+            </div>
+        <div class="campo">
+          <label for="c-nombre">Nombre / razón social <span class="obligatorio" aria-hidden="true">*</span></label>
+          <input type="text" id="c-nombre" required disabled>
+          <p class="mensaje-error"></p>
+        </div>
+        <div class="campo">
+          <label for="c-documento">Documento (NIT / C.C.) <span class="obligatorio" aria-hidden="true">*</span></label>
+          <input type="text" id="c-documento" required disabled data-tipo="documento" inputmode="numeric">
+          <p class="mensaje-error"></p>
+        </div>
+        <div class="campo">
+          <label for="c-telefono">Teléfono <span class="obligatorio" aria-hidden="true">*</span></label>
+          <input type="tel" id="c-telefono" required disabled data-tipo="telefono" inputmode="numeric">
+          <p class="mensaje-error"></p>
+        </div>
+        <div class="campo">
+          <label for="c-correo">Correo electrónico <span class="obligatorio" aria-hidden="true">*</span></label>
+          <input type="email" id="c-correo" required disabled>
+          <p class="mensaje-error"></p>
+        </div>
+        <div class="campo">
+          <label for="c-direccion">Dirección del inmueble <span class="obligatorio" aria-hidden="true">*</span></label>
+          <input type="text" id="c-direccion" required disabled>
+          <p class="mensaje-error"></p>
+        </div>
+            <div class="campo">
+              <label for="c-tipo">Tipo de cliente <span class="obligatorio" aria-hidden="true">*</span></label>
+              <select id="c-tipo" required disabled><option value="">Selecciona...</option><option>Empresa</option><option>Persona natural</option><option>Conjunto residencial</option></select>
+              <p class="mensaje-error"></p>
+            </div>
+          </fieldset>
+
+          <fieldset style="border:none">
+            <h3>Orden de servicio — HU-03</h3>
+            <fieldset class="campo" id="campo-servicios" style="border:none">
+              <legend class="etiqueta-grupo">Servicios a realizar <span class="obligatorio" aria-hidden="true">*</span></legend>
+              <div class="grilla-servicios" id="ods-servicios"></div>
+              <p class="mensaje-error">Selecciona al menos un servicio.</p>
+            </fieldset>
+        <div class="campo">
+          <label for="ods-area">Área a intervenir <span class="obligatorio" aria-hidden="true">*</span></label>
+          <input type="text" id="ods-area" required placeholder="Ej: cocina y bodega">
+          <p class="mensaje-error"></p>
+        </div>
+            <div class="fila-campos">
+        <div class="campo">
+          <label for="ods-fecha">Fecha programada <span class="obligatorio" aria-hidden="true">*</span></label>
+          <input type="date" id="ods-fecha" required>
+          <p class="mensaje-error"></p>
+        </div>
+        <div class="campo">
+          <label for="ods-hora">Hora <span class="obligatorio" aria-hidden="true">*</span></label>
+          <input type="time" id="ods-hora" required value="08:00">
+          <p class="mensaje-error"></p>
+        </div>
+            </div>
+        <div class="campo">
+          <label for="ods-comentarios">Comentario / observaciones</label>
+          <textarea id="ods-comentarios"></textarea>
+          <p class="mensaje-error"></p>
+        </div>
+            <div class="campo">
+              <p class="etiqueta-grupo">Productos a utilizar</p>
+              <small>Define la dosis y la cantidad a utilizar de cada producto. El técnico las verá automáticamente y solo registrará el lote, la zona y la especie.</small>
+              <ul class="lista-asignados" id="ods-productos"></ul>
+              <div class="fila-agregar">
+                <label for="ods-producto-sel" class="oculto">Producto</label>
+                <select id="ods-producto-sel"></select>
+                <button type="button" class="btn btn-secundario btn-chico" id="btn-asignar-producto">+ Agregar</button>
+              </div>
+            </div>
+            <div class="ods-generado" aria-live="polite">
+              <small>Número de ODS generado automáticamente</small>
+              <strong id="ods-numero">ODS-0000</strong>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="grupo-botones" style="margin-top:1.2rem">
+          <button type="submit" class="btn btn-primario" id="btn-guardar-ods">Guardar y generar ODS</button>
+          <button type="button" class="btn btn-secundario" id="btn-cancelar-ods">Cancelar</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <div class="modal" id="modal-detalle" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-detalle">
+    <div class="modal-caja">
+      <div class="modal-cabecera">
+        <h2 id="titulo-modal-detalle">Detalle de la orden</h2>
+        <button type="button" data-cerrar="modal-detalle" aria-label="Cerrar">&times;</button>
+      </div>
+      <div class="modal-cuerpo">
+        <div id="contenido-detalle"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/datos.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

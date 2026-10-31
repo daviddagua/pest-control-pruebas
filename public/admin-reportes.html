@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="David Liz Dagua">
+  <title>Reportes | PEST CONTROL</title>
+  <link rel="icon" href="img/logo.png">
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body data-rol="admin" data-menu="reportes">
+  <!-- La barra superior, el menú lateral y la navegación inferior los crea js/app.js según el rol -->
+  <main class="contenido" id="contenido">
+
+    <div class="encabezado-pagina">
+      <div>
+        <h1>Reportes</h1>
+        <p>Indicadores generales de la operación.</p>
+      </div>
+      <button class="btn btn-secundario no-imprimir" id="btn-imprimir">🖨️ Imprimir / PDF</button>
+    </div>
+
+    <section class="indicadores">
+      <div class="indicador"><span>Órdenes registradas</span><strong id="rep-total">0</strong></div>
+      <div class="indicador exito"><span>Servicios completados</span><strong id="rep-completadas">0</strong></div>
+      <div class="indicador"><span>Certificados enviados</span><strong id="rep-certificados">0</strong></div>
+      <div class="indicador alerta"><span>Clientes</span><strong id="rep-clientes">0</strong></div>
+    </section>
+
+    <div class="dos-columnas" style="gap:0 1.4rem">
+      <section class="tarjeta">
+        <h2>Servicios más solicitados</h2>
+        <div class="grafica" id="graf-plaga"></div>
+      </section>
+      <section class="tarjeta">
+        <h2>Órdenes por estado</h2>
+        <div class="grafica" id="graf-estado"></div>
+      </section>
+    </div>
+    <section class="tarjeta">
+      <h2>Órdenes asignadas por técnico</h2>
+      <div class="grafica" id="graf-tecnico"></div>
+    </section>
+  </main>
+
+
+  <script src="js/datos.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

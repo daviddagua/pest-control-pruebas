@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="David Liz Dagua">
+  <title>Productos | PEST CONTROL</title>
+  <link rel="icon" href="img/logo.png">
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body data-rol="admin" data-menu="productos">
+La barra superior, el menú lateral y la navegación inferior los crea js/app.js según el rol
+  <main class="contenido" id="contenido">
+
+    <div class="encabezado-pagina">
+      <div>
+        <h1>Productos e insumos</h1>
+        <p>Controla las existencias de insumos usados en los servicios.</p>
+      </div>
+      <button class="btn btn-primario" id="btn-nuevo-producto">+ Registrar producto</button>
+    </div>
+
+    <section class="tarjeta">
+      <div class="herramientas">
+        <label for="buscar-producto" class="oculto">Buscar producto</label>
+        <input type="search" id="buscar-producto" placeholder="🔍 Buscar por nombre o tipo">
+        <label class="casilla"><input type="checkbox" id="solo-bajos"> Solo stock bajo</label>
+      </div>
+      <input type="file" id="ficha-archivo" accept="application/pdf,.pdf" class="oculto" aria-label="Subir ficha de seguridad en PDF">
+      <div class="tabla-contenedor">
+        <table>
+          <thead><tr><th scope="col">Producto</th><th scope="col">Tipo</th><th scope="col">Stock</th><th scope="col">Mínimo</th><th scope="col">Dosis</th><th scope="col">Ficha de seguridad</th><th scope="col">Estado</th><th scope="col">Acciones</th></tr></thead>
+          <tbody id="tabla-productos"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal" id="modal-producto" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-producto">
+    <div class="modal-caja">
+      <div class="modal-cabecera">
+        <h2 id="titulo-modal-producto">Registrar producto</h2>
+        <button type="button" data-cerrar="modal-producto" aria-label="Cerrar">&times;</button>
+      </div>
+      <form class="modal-cuerpo" id="form-producto" novalidate>
+        <div class="campo">
+          <label for="prod-nombre">Nombre del producto <span class="obligatorio" aria-hidden="true">*</span></label>
+          <input type="text" id="prod-nombre" required>
+          <p class="mensaje-error"></p>
+        </div>
+        <div class="fila-campos">
+          <div class="campo">
+            <label for="prod-tipo">Tipo <span class="obligatorio" aria-hidden="true">*</span></label>
+            <select id="prod-tipo" required><option value="">Selecciona...</option><option>Insecticida</option><option>Rodenticida</option><option>Termiticida</option><option>Larvicida</option><option>Trampa</option><option>Herramienta</option></select>
+            <p class="mensaje-error"></p>
+          </div>
+          <div class="campo">
+            <label for="prod-unidad">Unidad <span class="obligatorio" aria-hidden="true">*</span></label>
+            <select id="prod-unidad" required><option value="">Selecciona...</option><option>L</option><option>kg</option><option>und</option><option>tubos</option></select>
+            <p class="mensaje-error"></p>
+          </div>
+        </div>
+        <div class="fila-campos">
+        <div class="campo">
+          <label for="prod-stock">Stock inicial <span class="obligatorio" aria-hidden="true">*</span></label>
+          <input type="number" id="prod-stock" required min="0">
+          <p class="mensaje-error"></p>
+        </div>
+        <div class="campo">
+          <label for="prod-minimo">Stock mínimo <span class="obligatorio" aria-hidden="true">*</span></label>
+          <input type="number" id="prod-minimo" required min="0">
+          <p class="mensaje-error"></p>
+        </div>
+        </div>
+        <div class="campo">
+          <label for="prod-dosis">Dosis recomendada</label>
+          <input type="text" id="prod-dosis" placeholder="Ej: 15 ml/L">
+          <p class="mensaje-error"></p>
+        </div>
+        <p class="ayuda">Después de guardarlo podrás subir su ficha de seguridad (PDF) desde la tabla.</p>
+        <div class="modal-pie">
+          <button type="button" class="btn btn-secundario" data-cerrar="modal-producto">Cancelar</button>
+          <button type="submit" class="btn btn-primario">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="modal" id="modal-movimientos" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-movimientos">
+    <div class="modal-caja">
+      <div class="modal-cabecera">
+        <h2 id="titulo-modal-movimientos">Movimientos de inventario</h2>
+        <button type="button" data-cerrar="modal-movimientos" aria-label="Cerrar">&times;</button>
+      </div>
+      <div class="modal-cuerpo">
+        <div id="contenido-movimientos"></div>
+      </div>
+    </div>
+  </div>
+  <div class="modal" id="modal-entrada" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-entrada">
+    <div class="modal-caja">
+      <div class="modal-cabecera">
+        <h2 id="titulo-modal-entrada">Entrada de inventario</h2>
+        <button type="button" data-cerrar="modal-entrada" aria-label="Cerrar">&times;</button>
+      </div>
+      <form class="modal-cuerpo" id="form-entrada" novalidate>
+        <input type="hidden" id="entrada-id">
+        <p class="ayuda" id="entrada-unidad" style="margin-bottom:.8rem"></p>
+        <div class="campo">
+          <label for="entrada-cantidad">Cantidad que ingresa <span class="obligatorio" aria-hidden="true">*</span></label>
+          <input type="number" id="entrada-cantidad" required min="1">
+          <p class="mensaje-error"></p>
+        </div>
+        <div class="modal-pie">
+          <button type="button" class="btn btn-secundario" data-cerrar="modal-entrada">Cancelar</button>
+          <button type="submit" class="btn btn-primario">Registrar entrada</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/datos.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

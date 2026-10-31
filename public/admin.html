@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="David Liz Dagua">
+  <title>Dashboard | PEST CONTROL</title>
+  <link rel="icon" href="img/logo.png">
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body data-rol="admin" data-menu="dashboard">
+  <!-- La barra superior, el menú lateral y la navegación inferior los crea js/app.js según el rol -->
+  <main class="contenido" id="contenido">
+
+    <div class="encabezado-pagina">
+      <div>
+        <h1>Panel general</h1>
+        <p>Bienvenido, <strong>Administrador</strong>. Desde aquí gestionas y controlas toda la información de PEST CONTROL.</p>
+      </div>
+      <a href="admin-ordenes.html#nueva" class="btn btn-primario">+ Nueva orden (ODS)</a>
+    </div>
+
+    <!-- Indicadores del día (RF18) -->
+    <section class="indicadores" aria-label="Indicadores del día">
+      <div class="indicador"><span>Servicios hoy</span><strong id="kpi-hoy">0</strong></div>
+      <div class="indicador exito"><span>Técnicos activos</span><strong id="kpi-tecnicos">0</strong></div>
+      <div class="indicador error"><span>Solicitudes pendientes</span><strong id="kpi-pendientes">0</strong></div>
+      <div class="indicador"><span>ODS generadas (mes)</span><strong id="kpi-mes">0</strong></div>
+    </section>
+
+    <!-- Módulos -->
+    <section aria-labelledby="titulo-modulos">
+      <h2 id="titulo-modulos">Panel administrativo</h2>
+      <div class="modulos">
+        <a class="modulo c1" href="admin-clientes.html"><span class="icono" aria-hidden="true">👥</span><strong>Clientes</strong><small>Gestiona la información de tus clientes.</small><span class="flecha" aria-hidden="true">➜</span></a>
+        <a class="modulo c2" href="admin-tecnicos.html"><span class="icono" aria-hidden="true">🧑‍🔧</span><strong>Técnicos</strong><small>Administra los técnicos.</small><span class="flecha" aria-hidden="true">➜</span></a>
+        <a class="modulo c3" href="admin-ordenes.html"><span class="icono" aria-hidden="true">📋</span><strong>Órdenes de servicio</strong><small>Consulta y gestiona las órdenes.</small><span class="flecha" aria-hidden="true">➜</span></a>
+        <a class="modulo c4" href="admin-asignacion.html"><span class="icono" aria-hidden="true">📍</span><strong>Servicios y asignación</strong><small>Asigna el técnico más adecuado.</small><span class="flecha" aria-hidden="true">➜</span></a>
+        <a class="modulo c5" href="admin-productos.html"><span class="icono" aria-hidden="true">🧪</span><strong>Productos</strong><small>Insumos y existencias.</small><span class="flecha" aria-hidden="true">➜</span></a>
+        <a class="modulo c6" href="admin-certificados.html"><span class="icono" aria-hidden="true">📄</span><strong>Certificados</strong><small>Historial de certificados generados.</small><span class="flecha" aria-hidden="true">➜</span></a>
+      </div>
+    </section>
+
+    <section class="tarjeta">
+      <div class="tarjeta-cabecera">
+        <h2>Órdenes de servicio recientes</h2>
+        <a href="admin-ordenes.html">Ver todas</a>
+      </div>
+      <div class="tabla-contenedor">
+        <table>
+          <thead><tr><th scope="col">N° ODS</th><th scope="col">Cliente</th><th scope="col">Servicios</th><th scope="col">Técnico</th><th scope="col">Estado</th></tr></thead>
+          <tbody id="tabla-recientes"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="tarjeta">
+      <div class="tarjeta-cabecera">
+        <h2>Alertas de inventario</h2>
+        <a href="admin-productos.html">Ir a productos</a>
+      </div>
+      <ul class="lista" id="lista-stock"></ul>
+    </section>
+  </main>
+
+
+  <script src="js/datos.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

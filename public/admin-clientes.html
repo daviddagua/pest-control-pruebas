@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="David Liz Dagua">
+  <title>Clientes | PEST CONTROL</title>
+  <link rel="icon" href="img/logo.png">
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body data-rol="admin" data-menu="clientes">
+  <!-- La barra superior, el menú lateral y la navegación inferior los crea js/app.js según el rol -->
+  <main class="contenido" id="contenido">
+
+    <div class="encabezado-pagina">
+      <div>
+        <h1>Clientes</h1>
+        <p>Registra clientes, consulta su historial de servicios y crea nuevas órdenes (HU-01, RF14).</p>
+      </div>
+      <button class="btn btn-primario" id="btn-nuevo-cliente">+ Registrar cliente</button>
+    </div>
+
+    <section class="tarjeta">
+      <div class="herramientas">
+        <label for="buscar-cliente" class="oculto">Buscar cliente</label>
+        <input type="search" id="buscar-cliente" placeholder="🔍 Buscar por nombre, documento o correo">
+        <span class="ayuda" id="total-clientes" aria-live="polite"></span>
+      </div>
+      <div class="tabla-contenedor">
+        <table>
+          <thead><tr><th scope="col">Cliente</th><th scope="col">Documento</th><th scope="col">Teléfono</th><th scope="col">Correo</th><th scope="col">Dirección</th><th scope="col">Acciones</th></tr></thead>
+          <tbody id="tabla-clientes"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal" id="modal-cliente" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-cliente">
+    <div class="modal-caja">
+      <div class="modal-cabecera">
+        <h2 id="titulo-modal-cliente">Registrar cliente</h2>
+        <button type="button" data-cerrar="modal-cliente" aria-label="Cerrar">&times;</button>
+      </div>
+      <form class="modal-cuerpo" id="form-cliente" novalidate>
+        <input type="hidden" id="cliente-id">
+        <div class="campo">
+          <label for="cliente-nombre">Nombre / razón social <span class="obligatorio" aria-hidden="true">*</span></label>
+          <input type="text" id="cliente-nombre" required>
+          <p class="mensaje-error"></p>
+        </div>
+        <div class="fila-campos">
+        <div class="campo">
+          <label for="cliente-documento">Documento (NIT / C.C.) <span class="obligatorio" aria-hidden="true">*</span></label>
+          <input type="text" id="cliente-documento" required data-tipo="documento" inputmode="numeric">
+          <p class="mensaje-error"></p>
+        </div>
+        <div class="campo">
+          <label for="cliente-telefono">Teléfono <span class="obligatorio" aria-hidden="true">*</span></label>
+          <input type="tel" id="cliente-telefono" required data-tipo="telefono" inputmode="numeric">
+          <p class="mensaje-error"></p>
+        </div>
+        </div>
+        <div class="campo">
+          <label for="cliente-correo">Correo electrónico <span class="obligatorio" aria-hidden="true">*</span></label>
+          <input type="email" id="cliente-correo" required>
+          <p class="mensaje-error"></p>
+        </div>
+        <div class="campo">
+          <label for="cliente-direccion">Dirección del inmueble <span class="obligatorio" aria-hidden="true">*</span></label>
+          <input type="text" id="cliente-direccion" required>
+          <p class="mensaje-error"></p>
+        </div>
+        <div class="campo">
+          <label for="cliente-tipo">Tipo de cliente <span class="obligatorio" aria-hidden="true">*</span></label>
+          <select id="cliente-tipo" required><option value="">Selecciona...</option><option>Empresa</option><option>Persona natural</option><option>Conjunto residencial</option></select>
+          <p class="mensaje-error"></p>
+        </div>
+        <p class="ayuda">Los datos personales se tratan conforme a la Ley 1581 de 2012.</p>
+        <div class="modal-pie">
+          <button type="button" class="btn btn-secundario" data-cerrar="modal-cliente">Cancelar</button>
+          <button type="submit" class="btn btn-primario">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="modal" id="modal-historial" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-historial">
+    <div class="modal-caja">
+      <div class="modal-cabecera">
+        <h2 id="titulo-modal-historial">Historial</h2>
+        <button type="button" data-cerrar="modal-historial" aria-label="Cerrar">&times;</button>
+      </div>
+      <div class="modal-cuerpo">
+        <div id="contenido-historial"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/datos.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="David Liz Dagua">
+  <title>Detalle de la visita | PEST CONTROL</title>
+  <link rel="icon" href="img/logo.png">
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body data-rol="tecnico" data-menu="inicio">
+  La barra superior, el menú lateral y la navegación inferior los crea js/app.js según el rol
+  <main class="contenido" id="contenido">
+
+     Detalle de la visita (app del técnico, mobile first) 
+    <div style="max-width:620px;margin:0 auto">
+      <div class="encabezado-pagina" style="background:var(--navy);color:#fff;border-radius:10px;padding:.7rem 1rem">
+        <a href="tecnico.html" style="color:#fff;text-decoration:none" aria-label="Volver a mis visitas">← Visitas</a>
+        <span class="cronometro" id="cronometro" role="timer" aria-label="Tiempo de la visita">00:00:00</span>
+      </div>
+
+      <h1 id="visita-titulo">ODS</h1>
+      <p class="ayuda" id="visita-sub"></p>
+      <p class="ayuda" id="visita-programada" style="color:var(--azul);font-weight:700;margin-bottom:.6rem"></p>
+      <div class="registro-tiempos" id="registro-tiempos" hidden>
+        <div><span>Hora de inicio</span><strong id="dato-inicio">—</strong></div>
+        <div><span>Hora de finalización</span><strong id="dato-fin">—</strong></div>
+        <div class="ancho-completo"><span>📍 Ubicación al iniciar</span><strong id="dato-ubicacion">—</strong></div>
+      </div>
+
+      <div class="acordeon" id="acordeon">
+        <div>
+          <button class="acordeon-boton" aria-expanded="false" aria-controls="panel-tareas">Servicios a realizar</button>
+          <div class="acordeon-panel" id="panel-tareas">
+            <ul id="lista-tareas"></ul>
+          </div>
+        </div>
+        <div>
+          <button class="acordeon-boton" aria-expanded="false" aria-controls="panel-productos">Productos utilizados</button>
+          <div class="acordeon-panel" id="panel-productos">
+            <p class="ayuda" style="margin-bottom:.7rem">Productos asignados por el administrador. Registra el lote, la zona donde se aplicó y la especie tratada.</p>
+            <ul id="lista-productos" class="lista-productos-tecnico"></ul>
+            <datalist id="lista-especies"></datalist>
+          </div>
+        </div>
+        <div>
+          <button class="acordeon-boton" aria-expanded="false" aria-controls="panel-incidencias">Incidencias</button>
+          <div class="acordeon-panel" id="panel-incidencias">
+            <div class="campo"><label for="txt-incidencias">Describe cualquier novedad durante la visita</label>
+            <textarea id="txt-incidencias" data-guardar="incidencias"></textarea></div>
+            <div class="campo">
+              <label for="foto-evidencia">Evidencia fotográfica</label>
+              <input type="file" id="foto-evidencia" accept="image/*" capture="environment">
+              <small>Toma o sube fotos de lo encontrado (nidos, daños, rastros, etc.). Aparecerán en el certificado.</small>
+            </div>
+            <div id="galeria" class="galeria"></div>
+          </div>
+        </div>
+        <div>
+          <button class="acordeon-boton" aria-expanded="false" aria-controls="panel-notas">Notas técnicas</button>
+          <div class="acordeon-panel" id="panel-notas">
+            <div class="campo"><label for="txt-notas">Notas internas (no las ve el cliente)</label>
+            <textarea id="txt-notas" data-guardar="notasTecnicas"></textarea></div>
+          </div>
+        </div>
+        <div>
+          <button class="acordeon-boton" aria-expanded="false" aria-controls="panel-nota-cliente">Nota para el cliente en el Certificado de servicio</button>
+          <div class="acordeon-panel" id="panel-nota-cliente">
+            <div class="campo"><label for="txt-nota-cliente">Esta nota aparecerá en el certificado</label>
+            <textarea id="txt-nota-cliente" data-guardar="notaCliente"></textarea></div>
+          </div>
+        </div>
+        <div>
+          <button class="acordeon-boton" aria-expanded="false" aria-controls="panel-documentacion">Documentación</button>
+          <div class="acordeon-panel" id="panel-documentacion">
+            <p class="ayuda" style="margin-bottom:.8rem">Fichas de seguridad de los productos de esta orden. Disponibles mientras la orden esté abierta.</p>
+            <ul id="lista-documentos" class="lista-documentos"></ul>
+          </div>
+        </div>
+      </div>
+
+      <p class="ayuda">Técnico asignado:</p>
+      <span class="chip" id="chip-tecnico"><span class="avatar">DL</span><span>David Liz</span></span>
+
+      <div class="aviso-estado" id="aviso-estado" role="status">Aún no has iniciado esta visita</div>
+
+      Antes de iniciar 
+      <div id="botones-inicio" class="grupo-botones" style="flex-direction:column">
+        <p class="ayuda" style="margin-bottom:.2rem">📍 Al empezar se registrará la <strong>hora de inicio</strong> y tu <strong>ubicación GPS</strong> (obligatoria). Activa la ubicación del dispositivo.</p>
+        <p class="ayuda" id="error-ubicacion" role="alert" style="color:var(--error);font-weight:600" hidden></p>
+        <button type="button" class="btn btn-secundario btn-bloque" id="btn-ubicacion-prueba" hidden>🧪 Usar ubicación de prueba (solo demostración)</button>
+        <button class="btn btn-exito btn-bloque" id="btn-empezar">Empezar trabajo</button>
+        <button class="btn btn-peligro btn-bloque" id="btn-cancelar-antes">Cancelar trabajo</button>
+      </div>
+
+      Durante la visita 
+      <div id="botones-trabajo" class="botones-trabajo" hidden>
+        <button class="btn btn-exito" id="btn-finalizar">Finalizar trabajo</button>
+        <button class="btn btn-pausa" id="btn-pausar">Pausar trabajo</button>
+        <button class="btn btn-gris" id="btn-anular">Anular trabajo</button>
+        <button class="btn btn-peligro" id="btn-cancelar">Cancelar trabajo</button>
+      </div>
+
+     Servicio cerrado 
+      <div id="bloque-cerrado" hidden>
+        <div class="ods-generado" style="margin:1rem 0">
+          <small>Certificado generado</small>
+          <strong id="texto-certificado">Enviado</strong>
+        </div>
+        <div class="grupo-botones">
+          <button class="btn btn-primario" id="btn-ver-certificado">Ver certificado</button>
+          <a class="btn btn-secundario" href="tecnico.html">Volver a mis visitas</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+   P6. Finalizar trabajo — firma de la orden de trabajo
+  <div class="modal" id="modal-finalizar" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-finalizar">
+    <div class="modal-caja">
+      <div class="modal-cabecera">
+        <h2 id="titulo-modal-finalizar">Finalizar trabajo</h2>
+        <button type="button" data-cerrar="modal-finalizar" aria-label="Cerrar">&times;</button>
+      </div>
+      <form class="modal-cuerpo" id="form-finalizar" novalidate>
+        <div class="horas-visita">
+          <div><small>Hora de inicio</small><strong id="fin-hora-inicio"></strong></div>
+          <div><small>Hora de finalización</small><strong id="fin-hora-fin"></strong></div>
+          <div><small>Duración</small><strong id="fin-duracion"></strong></div>
+        </div>
+        <p class="ayuda">📍 Ubicación al iniciar: <strong id="fin-ubicacion"></strong></p>
+        <p style="margin:.5rem 0 .3rem"><strong>Técnicos asignados:</strong></p>
+        <span class="chip" id="fin-chip"></span>
+
+        <div class="acordeon" style="margin-top:1rem">
+          <div>
+            <button type="button" class="acordeon-boton" aria-expanded="true" aria-controls="fin-servicios">Servicios realizados</button>
+            <div class="acordeon-panel abierto" id="fin-servicios"><ul id="fin-lista-servicios"></ul></div>
+          </div>
+          <div>
+            <button type="button" class="acordeon-boton" aria-expanded="true" aria-controls="fin-firma">Firma de la orden de trabajo</button>
+            <div class="acordeon-panel abierto" id="fin-firma" style="background:#fff">
+              <div class="campo">
+                <label for="firma-nombre">Nombre de la persona que firma <span class="obligatorio" aria-hidden="true">*</span></label>
+                <input type="text" id="firma-nombre" required autocomplete="off">
+                <p class="mensaje-error"></p>
+              </div>
+              <div class="campo">
+                <label for="firma-documento">DNI de la persona que firma <span class="obligatorio" aria-hidden="true">*</span></label>
+                <input type="text" id="firma-documento" inputmode="numeric" data-tipo="documento" required>
+                <p class="mensaje-error"></p>
+              </div>
+              <div class="campo" id="campo-firma">
+                <label for="lienzo-firma">Firma de quien recibe <span class="obligatorio" aria-hidden="true">*</span></label>
+                <canvas id="lienzo-firma" class="firma-lienzo" aria-label="Recuadro para firmar con el dedo o el mouse"></canvas>
+                <p class="mensaje-error">Falta la firma de quien recibe el servicio.</p>
+              </div>
+              <div class="grupo-botones" style="margin-bottom:1rem">
+                <button type="button" class="btn btn-gris btn-chico" id="btn-limpiar-firma">⌫ Limpiar firma</button>
+                <label class="btn btn-naranja btn-chico" for="imagen-firma" style="cursor:pointer">Elegir imagen</label>
+                <input type="file" id="imagen-firma" accept="image/*" class="oculto">
+              </div>
+            </div>
+          </div>
+          <div>
+            <button type="button" class="acordeon-boton" aria-expanded="true" aria-controls="fin-firma-tecnico">Firma del técnico (automática)</button>
+            <div class="acordeon-panel abierto" id="fin-firma-tecnico" style="background:#fff">
+              <p class="ayuda" style="margin-bottom:.5rem">Técnico responsable: <strong id="firma-tecnico-nombre"></strong></p>
+              <div class="firma-guardada" id="firma-tec-guardada" hidden>
+                <img id="firma-tec-imagen" alt="Firma registrada del técnico">
+                <p>✅ Tu firma registrada se pondrá <strong>automáticamente</strong> en el certificado.</p>
+              </div>
+              <p class="aviso-estado" id="firma-tec-falta" hidden>⚠️ No tienes firma registrada. Puedes cerrar la orden, pero el certificado saldrá sin tu firma. Pide al administrador que la cargue en <strong>Técnicos</strong>.</p>
+            </div>
+          </div>
+        </div>
+
+        <label class="casilla"><input type="checkbox" id="enviar-parte" checked> Enviar copia del parte por email al cliente</label>
+        <label class="casilla"><input type="checkbox" id="enviar-certificado" checked> ¿Enviar certificado de servicio?</label>
+        <div class="campo">
+          <label for="correos-envio">Emails (separados por coma)</label>
+          <input type="text" id="correos-envio">
+          <p class="mensaje-error"></p>
+        </div>
+
+        <button type="submit" class="btn btn-primario btn-bloque">Guardar y finalizar</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="modal-certificado" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-certificado">
+    <div class="modal-caja" style="max-width:720px">
+      <div class="modal-cabecera">
+        <h2 id="titulo-modal-certificado">Certificado de servicio</h2>
+        <button type="button" data-cerrar="modal-certificado" aria-label="Cerrar">&times;</button>
+      </div>
+      <div class="modal-cuerpo">
+        <div id="contenido-certificado"></div>
+        <div class="modal-pie" style="margin-top:1rem">
+          <button type="button" class="btn btn-primario" id="btn-descargar">Descargar PDF</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/datos.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/certificado.js"></script>
+  <script src="js/tecnico.js"></script>
+</body>
+</html>

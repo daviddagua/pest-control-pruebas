@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="David Liz Dagua">
+  <title>Técnicos | PEST CONTROL</title>
+  <link rel="icon" href="img/logo.png">
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body data-rol="admin" data-menu="tecnicos">
+  <!-- La barra superior, el menú lateral y la navegación inferior los crea js/app.js según el rol -->
+  <main class="contenido" id="contenido">
+
+    <div class="encabezado-pagina">
+      <div>
+        <h1>Técnicos</h1>
+        <p>Consulta el personal de campo, su especialidad y su carga de trabajo.</p>
+      </div>
+      <button class="btn btn-primario" id="btn-nuevo-tecnico">+ Registrar técnico</button>
+    </div>
+
+    <section class="tarjeta">
+      <div class="tabla-contenedor">
+        <table>
+          <thead><tr><th scope="col">Técnico</th><th scope="col">Especialidad</th><th scope="col">Teléfono</th><th scope="col">Carga laboral</th><th scope="col">Servicios activos</th><th scope="col">Firma</th><th scope="col">Estado</th><th scope="col">Acciones</th></tr></thead>
+          <tbody id="tabla-tecnicos"></tbody>
+        </table>
+      </div>
+      <p class="nota-info">Los técnicos inactivos no aparecen en la asignación inteligente.</p>
+    </section>
+  </main>
+
+  <div class="modal" id="modal-tecnico" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-tecnico">
+    <div class="modal-caja">
+      <div class="modal-cabecera">
+        <h2 id="titulo-modal-tecnico">Registrar técnico</h2>
+        <button type="button" data-cerrar="modal-tecnico" aria-label="Cerrar">&times;</button>
+      </div>
+      <form class="modal-cuerpo" id="form-tecnico" novalidate>
+        <div class="campo">
+          <label for="tec-nombre">Nombre completo <span class="obligatorio" aria-hidden="true">*</span></label>
+          <input type="text" id="tec-nombre" required>
+          <p class="mensaje-error"></p>
+        </div>
+        <div class="campo">
+          <label for="tec-especialidad">Especialidad <span class="obligatorio" aria-hidden="true">*</span></label>
+          <select id="tec-especialidad" required>
+            <option value="">Selecciona...</option><option>Cucarachas</option><option>Roedores</option>
+            <option>Termitas</option><option>Mosquitos</option><option>Cucarachas / Roedores</option><option>Roedores / Termitas</option>
+          </select>
+          <p class="mensaje-error"></p>
+        </div>
+        <div class="campo">
+          <label for="tec-telefono">Teléfono <span class="obligatorio" aria-hidden="true">*</span></label>
+          <input type="tel" id="tec-telefono" required data-tipo="telefono" inputmode="numeric">
+          <p class="mensaje-error"></p>
+        </div>
+        <div class="modal-pie">
+          <button type="button" class="btn btn-secundario" data-cerrar="modal-tecnico">Cancelar</button>
+          <button type="submit" class="btn btn-primario">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="modal" id="modal-firma-tecnico" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-firma-tecnico">
+    <div class="modal-caja">
+      <div class="modal-cabecera">
+        <h2 id="titulo-modal-firma-tecnico">Firma del técnico</h2>
+        <button type="button" data-cerrar="modal-firma-tecnico" aria-label="Cerrar">&times;</button>
+      </div>
+      <form class="modal-cuerpo" id="form-firma-tecnico" novalidate>
+        <input type="hidden" id="firma-tec-id">
+        <p class="ayuda" style="margin-bottom:.8rem">Sube la imagen de la firma (foto o escaneo) o dibújala. Se pondrá automáticamente en los certificados de las órdenes que cierre este técnico.</p>
+        <div class="campo" id="campo-firma-admin">
+          <label for="lienzo-firma-admin">Firma <span class="obligatorio" aria-hidden="true">*</span></label>
+          <canvas id="lienzo-firma-admin" class="firma-lienzo" aria-label="Vista previa de la firma del técnico"></canvas>
+          <p class="mensaje-error">Sube una imagen o dibuja la firma.</p>
+        </div>
+        <div class="grupo-botones" style="margin-bottom:1rem">
+          <label class="btn btn-naranja btn-chico" for="imagen-firma-admin" style="cursor:pointer">⬆ Subir imagen de la firma</label>
+          <input type="file" id="imagen-firma-admin" accept="image/*" class="oculto">
+          <button type="button" class="btn btn-gris btn-chico" id="btn-limpiar-firma-admin">⌫ Limpiar</button>
+          <button type="button" class="btn btn-secundario btn-chico" id="btn-quitar-firma-admin">Quitar firma registrada</button>
+        </div>
+        <div class="modal-pie">
+          <button type="button" class="btn btn-secundario" data-cerrar="modal-firma-tecnico">Cancelar</button>
+          <button type="submit" class="btn btn-primario">Guardar firma</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/datos.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

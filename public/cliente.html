@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="David Liz Dagua">
+  <title>Resumen | PEST CONTROL</title>
+  <link rel="icon" href="img/logo.png">
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body data-rol="cliente" data-menu="resumen">
+  <!-- La barra superior, el menú lateral y la navegación inferior los crea js/app.js según el rol -->
+  <main class="contenido" id="contenido">
+
+    <div class="encabezado-pagina">
+      <div>
+        <p>Cliente</p>
+        <h1>Bienvenido, <span id="nombre-cliente">cliente</span>!</h1>
+        <p>Desde aquí puedes consultar tus servicios, certificados y facturas, sin llamar a la empresa.</p>
+      </div>
+    </div>
+
+    <section aria-labelledby="titulo-cuenta">
+      <h2 id="titulo-cuenta">Mi cuenta</h2>
+      <div class="modulos">
+        <a class="modulo c1" href="cliente.html#datos"><span class="icono" aria-hidden="true">🏠</span><strong>Resumen</strong><small>Datos generales de tu cuenta.</small><span class="flecha" aria-hidden="true">➜</span></a>
+        <a class="modulo c2" href="cliente-servicios.html"><span class="icono" aria-hidden="true">📅</span><strong>Servicios y visitas</strong><small>Historial de visitas.</small><span class="flecha" aria-hidden="true">➜</span></a>
+        <a class="modulo c3" href="cliente-certificados.html"><span class="icono" aria-hidden="true">📄</span><strong>Certificados</strong><small>Descarga tus certificados.</small><span class="flecha" aria-hidden="true">➜</span></a>
+        <a class="modulo c4" href="cliente-facturas.html"><span class="icono" aria-hidden="true">🧾</span><strong>Facturas</strong><small>Historial de pagos.</small><span class="flecha" aria-hidden="true">➜</span></a>
+        <a class="modulo c5" href="cliente-avisos.html"><span class="icono" aria-hidden="true">🔔</span><strong>Avisos</strong><small>Notificaciones importantes.</small><span class="flecha" aria-hidden="true">➜</span></a>
+      </div>
+    </section>
+
+    <h2>Resumen de cuenta</h2>
+    <section class="indicadores">
+      <div class="indicador"><span>Servicios</span><strong id="cli-servicios">0</strong></div>
+      <div class="indicador"><span>Certificados</span><strong id="cli-certificados">0</strong></div>
+      <div class="indicador alerta"><span>Facturas pendientes</span><strong id="cli-facturas">0</strong></div>
+    </section>
+
+    <section class="tarjeta">
+      <div class="tarjeta-cabecera"><h2>Certificados recientes</h2><a href="cliente-certificados.html">Ver todos</a></div>
+      <ul class="lista" id="lista-cert-recientes"></ul>
+    </section>
+
+    <section class="tarjeta" id="datos">
+      <h2>Datos de la cuenta</h2>
+      <div id="datos-cliente"></div>
+    </section>
+  </main>
+
+
+  <script src="js/datos.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/certificado.js"></script>
+  <script src="js/cliente.js"></script>
+</body>
+</html>

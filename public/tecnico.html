@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="David Liz Dagua">
+  <title>Mis visitas del día | PEST CONTROL</title>
+  <link rel="icon" href="img/logo.png">
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body data-rol="tecnico" data-menu="inicio">
+  <!-- La barra superior, el menú lateral y la navegación inferior los crea js/app.js según el rol -->
+  <main class="contenido" id="contenido">
+
+    <div class="encabezado-pagina">
+      <div>
+        <p>Técnico</p>
+        <h1>Bienvenido, <span id="nombre-tecnico">Técnico</span>!</h1>
+        <p>Tu trabajo de hoy, en un solo lugar. Revisa tus visitas y cierra cada servicio.</p>
+      </div>
+    </div>
+
+    <section aria-labelledby="titulo-panel-tecnico">
+      <h2 id="titulo-panel-tecnico">Panel del técnico</h2>
+      <div class="modulos">
+        <a class="modulo c1" href="#visitas-hoy"><span class="icono" aria-hidden="true">📅</span><strong>Mis visitas del día</strong><small>Consulta tus visitas asignadas.</small><span class="flecha" aria-hidden="true">➜</span></a>
+        <a class="modulo c2" href="#" id="ir-detalle"><span class="icono" aria-hidden="true">📝</span><strong>Detalle de la visita</strong><small>Registra servicios y productos usados.</small><span class="flecha" aria-hidden="true">➜</span></a>
+        <a class="modulo c3" href="#" id="ir-finalizar"><span class="icono" aria-hidden="true">✍️</span><strong>Finalizar trabajo</strong><small>Firma y genera el certificado.</small><span class="flecha" aria-hidden="true">➜</span></a>
+      </div>
+    </section>
+
+    <section class="tarjeta tarjeta-firma" id="mi-firma">
+      <div class="tarjeta-cabecera"><h2>Mi firma</h2></div>
+      <div class="mi-firma-contenido">
+        <div class="mi-firma-vista" id="mi-firma-vista"></div>
+        <div>
+          <p class="ayuda" id="mi-firma-texto"></p>
+        </div>
+      </div>
+    </section>
+
+    <h2>Resumen de hoy</h2>
+    <section class="indicadores" aria-label="Resumen de hoy">
+      <div class="indicador"><span>Visitas hoy</span><strong id="res-visitas">0</strong></div>
+      <div class="indicador exito"><span>Completadas</span><strong id="res-completadas">0</strong></div>
+      <div class="indicador alerta"><span>Pendientes</span><strong id="res-pendientes">0</strong></div>
+    </section>
+
+    <section class="tarjeta" id="visitas-hoy">
+      <div class="tarjeta-cabecera"><h2>Visitas de hoy</h2></div>
+      <ul class="lista" id="lista-visitas"></ul>
+    </section>
+
+    <section class="tarjeta" id="proximas">
+      <div class="tarjeta-cabecera"><h2>Próximas visitas</h2></div>
+      <ul class="lista" id="lista-proximas"></ul>
+    </section>
+
+    <section class="tarjeta" id="historial">
+      <div class="tarjeta-cabecera"><h2>Historial de servicios</h2></div>
+      <div class="tabla-contenedor">
+        <table>
+          <thead><tr><th scope="col">N° ODS</th><th scope="col">Cliente</th><th scope="col">Servicio</th><th scope="col">Fecha</th><th scope="col">Inicio – Fin</th><th scope="col">Duración</th><th scope="col">Estado</th></tr></thead>
+          <tbody id="tabla-historial"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+
+  <script src="js/datos.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/tecnico.js"></script>
+</body>
+</html>
