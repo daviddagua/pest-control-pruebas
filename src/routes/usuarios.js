@@ -3,6 +3,7 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const db = require("../db");
 const { soloRol, ROLES } = require("../middleware");
+const archivos = require("../services/archivos");
 const { texto, entero, bad, conflict, notFound, reCorreo, reDocumento, reClave } = require("../utils");
 
 const router = express.Router();
@@ -74,6 +75,31 @@ router.put("/:id/estado", async (req, res) => {
     }
     await c.query("UPDATE usuario SET estado = ? WHERE id_usuario = ?", [estado, id]);
   });
+  res.json({ ok: true });
+});
+
+/** Elimina un usuario. Si ya tiene visitas registradas se pide inactivarlo para no perder el historial. */
+router.delete("/:id", async (req, res) => {
+  const id = entero(req.params.id, "usuario");
+  if (id === req.usuario.id_usuario) throw bad("No puedes eliminar tu propia cuenta.");
+  let firma = null;
+  await db.transaction(async (c) => {
+    const [[u]] = await c.query(
+      "SELECT r.nombre_rol FROM usuario u JOIN rol r ON r.id_rol = u.id_rol WHERE u.id_usuario = ? FOR UPDATE", [id]);
+    if (!u) throw notFound("El usuario no existe.");
+    if (u.nombre_rol === "Administrador" && !(await quedaOtroAdmin(c, id))) {
+      throw conflict("Debe quedar al menos un administrador activo.");
+    }
+    const [[t]] = await c.query("SELECT id_tecnico, firma_ruta FROM tecnico WHERE id_usuario = ? FOR UPDATE", [id]);
+    if (t) {
+      const [[n]] = await c.query("SELECT COUNT(*) AS n FROM servicio WHERE id_tecnico = ?", [t.id_tecnico]);
+      if (n.n > 0) throw conflict("Este técnico ya tiene órdenes registradas. Mejor inactívalo para conservar el historial.");
+      firma = t.firma_ruta;
+      await c.query("DELETE FROM tecnico WHERE id_tecnico = ?", [t.id_tecnico]);
+    }
+    await c.query("DELETE FROM usuario WHERE id_usuario = ?", [id]);
+  });
+  if (firma) archivos.borrar("firmas", firma);
   res.json({ ok: true });
 });
 

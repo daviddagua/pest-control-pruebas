@@ -113,7 +113,7 @@ function pantallaClientes() {
     if (historial) {
       const c = buscarCliente(historial.dataset.historial);
       const ordenes = datos.ordenes.filter(o => o.clienteId === c.id).sort((a, b) => b.fecha.localeCompare(a.fecha));
-      document.getElementById("titulo-historial").textContent = "Historial · " + c.nombre;
+      document.getElementById("titulo-modal-historial").textContent = "Historial · " + c.nombre;
       document.getElementById("contenido-historial").innerHTML = ordenes.length
         ? `<ul class="lista">${ordenes.map(o => `<li>
             <div><strong>${o.numero}</strong> · ${seguro(textoServicios(o))}<small>${formatoFecha(o.fecha)} · ${seguro(nombreTecnico(o.tecnicoId))}</small></div>
@@ -342,7 +342,7 @@ function pantallaOrdenes() {
         const prod = buscarProducto(p.productoId);
         return `<li>${seguro(prod ? prod.nombre : "Producto")} — dosis ${seguro(textoDosis(p))} · cantidad ${seguro(textoCantidad(p))}${prod && prod.ficha ? " · 📄 ficha" : ""}</li>`;
       }).join("") || "<li>Sin productos asignados</li>";
-      el("titulo-detalle").textContent = o.numero + " · " + c.nombre;
+      el("titulo-modal-detalle").textContent = o.numero + " · " + c.nombre;
       el("contenido-detalle").innerHTML = `
         <p><strong>Estado:</strong> ${etiquetaEstado(o.estado)}</p>
         <p><strong>Servicios a realizar:</strong> ${seguro(textoServicios(o))}</p>
@@ -1215,7 +1215,8 @@ function pantallaUsuarios() {
         </td>
         <td>${etiquetaEstado(u.estado)}</td>
         <td>${u.id === sesion.usuarioId ? "<small>Tu cuenta</small>" :
-          `<button class="btn btn-secundario btn-chico" data-estado="${u.id}">${u.estado === "Activo" ? "Inactivar" : "Activar"}</button>`}</td>
+          `<div class="acciones"><button class="btn btn-secundario btn-chico" data-estado="${u.id}">${u.estado === "Activo" ? "Inactivar" : "Activar"}</button>
+           <button class="btn btn-peligro btn-chico" data-eliminar="${u.id}">Eliminar</button></div>`}</td>
       </tr>`).join("");
   }
 
@@ -1233,6 +1234,21 @@ function pantallaUsuarios() {
   });
 
   tabla.addEventListener("click", async e => {
+    const eliminar = e.target.closest("[data-eliminar]");
+    if (eliminar) {
+      const u = datos.usuarios.find(x => x.id === Number(eliminar.dataset.eliminar));
+      if (!confirm(`¿Eliminar a ${u.nombre}? Esta acción no se puede deshacer.`)) return;
+      try {
+        await api("DELETE", "/usuarios/" + u.id);
+        await recargarDatos();
+      } catch (err) {
+        errorApi(err);
+        return;
+      }
+      mostrarAviso("Usuario eliminado.");
+      pintar();
+      return;
+    }
     const boton = e.target.closest("[data-estado]");
     if (!boton) return;
     const u = datos.usuarios.find(x => x.id === Number(boton.dataset.estado));
