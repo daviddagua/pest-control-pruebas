@@ -520,6 +520,25 @@ fieldset { min-width: 0; }
 .lista-productos-tecnico .campo { margin-bottom: .6rem; }
 .lista-productos-tecnico .fila-campos { gap: 0 .7rem; }
 
+/* Zonas del cliente (las crea el técnico) y su selector en cada producto */
+.chips-zonas { list-style: none; display: flex; flex-wrap: wrap; gap: .4rem; margin: .5rem 0; }
+.chips-zonas li {
+  display: inline-flex; align-items: center; gap: .3rem;
+  background: #fff; border: 1px solid var(--borde); border-radius: 999px; padding: .2rem .3rem .2rem .7rem; font-size: .88rem;
+}
+.chips-zonas li.ayuda { border: none; background: none; padding: 0; }
+.chips-zonas button {
+  border: none; background: none; color: var(--gris); font-size: 1.1rem; line-height: 1; cursor: pointer;
+  width: 1.6rem; height: 1.6rem; border-radius: 50%;
+}
+.chips-zonas button:hover:not(:disabled) { background: var(--azul-claro); color: var(--error); }
+.selector-zonas { border: 1px solid var(--borde); border-radius: 8px; background: #fff; }
+.selector-zonas summary { padding: .55rem .8rem; cursor: pointer; overflow-wrap: anywhere; }
+.selector-zonas[open] summary { border-bottom: 1px solid var(--borde); }
+.opciones-zonas { padding: .4rem .8rem; max-height: 220px; overflow-y: auto; }
+.opciones-zonas .casilla { display: flex; margin: .3rem 0; }
+.campo.con-error .selector-zonas { border-color: var(--error); }
+
 @media (max-width: 768px) {
   .fila-agregar { grid-template-columns: 1fr; }
 }

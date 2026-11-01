@@ -48,7 +48,26 @@ async function verificarAcceso() {
     location.href = "error.html?codigo=403";
     return false;
   }
+  if (sesion.rol === "cliente") return true;
+
+  // La cookie de sesión es la misma en todas las pestañas: si en otra pestaña se inició sesión
+  // con otro usuario, esta pestaña se pone al día en vez de enviar cambios con el usuario equivocado.
+  if (!(await sesionCoincide(rolPagina))) return false;
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") sesionCoincide(rolPagina);
+  });
   return true;
+}
+
+async function sesionCoincide(rolPagina) {
+  const local = obtenerSesion() || {};
+  let real;
+  try { real = await api("GET", "/auth/yo"); } catch (e) { return false; }   // 401: api() ya redirige
+  if (real.rol === local.rol && real.usuarioId === local.usuarioId && real.tecnicoId === local.tecnicoId) return true;
+  guardarSesion({ ...local, ...real, rolTexto: real.rol === "admin" ? "Administrador" : "Técnico" });
+  if (real.rol !== rolPagina) location.href = real.rol === "admin" ? "admin.html" : "tecnico.html";
+  else location.reload();
+  return false;
 }
 
 /*2. Menús de cada rol (mismos nombres del mapa de navegación)*/

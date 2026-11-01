@@ -3,8 +3,18 @@ const jwt = require("jsonwebtoken");
 const config = require("./config");
 const db = require("./db");
 
-const COOKIE = "pc_sesion";
 const ROLES = { ADMIN: "Administrador", TECNICO: "Tecnico", CLIENTE: "Cliente" };
+
+// Una cookie por tipo de sesión: así el administrador y el técnico pueden estar abiertos
+// a la vez en pestañas distintas del mismo navegador sin que uno cierre al otro.
+const SESIONES = ["admin", "tecnico", "cliente"];
+const COOKIE = (sesion) => "pc_sesion_" + sesion;
+
+/** Qué sesión pide la pestaña (encabezado X-Sesion, lo pone el navegador según la pantalla). */
+function sesionPedida(req) {
+  const s = req.headers["x-sesion"];
+  return SESIONES.includes(s) ? s : null;
+}
 
 /** Lee una cookie del encabezado (sin librerías extra). */
 function leerCookie(req, nombre) {
@@ -17,10 +27,10 @@ function leerCookie(req, nombre) {
 }
 
 /** Guarda la sesión en una cookie HttpOnly: el JavaScript de la página no puede leerla ni robarla. */
-function iniciarSesion(res, payload) {
+function iniciarSesion(res, payload, sesion) {
   const token = jwt.sign(payload, config.jwtSecret, { expiresIn: config.jwtExpires });
   const segundos = Math.round((jwt.decode(token).exp - jwt.decode(token).iat));
-  res.cookie(COOKIE, token, {
+  res.cookie(COOKIE(sesion), token, {
     httpOnly: true,
     sameSite: "strict",
     secure: config.publicUrl.startsWith("https://"),
@@ -29,8 +39,25 @@ function iniciarSesion(res, payload) {
   });
 }
 
-function cerrarSesion(res) {
-  res.clearCookie(COOKIE, { path: "/" });
+/** Cierra la sesión de esta pestaña (o todas si no indica cuál). */
+function cerrarSesion(req, res) {
+  const pedida = sesionPedida(req);
+  for (const s of pedida ? [pedida] : SESIONES) res.clearCookie(COOKIE(s), { path: "/" });
+  res.clearCookie("pc_sesion", { path: "/" });   // cookie única de versiones anteriores
+}
+
+/**
+ * Token de la sesión que corresponde a esta petición. Las peticiones de la página traen X-Sesion;
+ * las que hace el navegador solo (una <img> de evidencia, un PDF) no, y usan la primera sesión válida.
+ */
+function leerToken(req) {
+  const pedida = sesionPedida(req);
+  for (const s of pedida ? [pedida] : SESIONES) {
+    const token = leerCookie(req, COOKIE(s));
+    if (!token) continue;
+    try { return { payload: jwt.verify(token, config.jwtSecret) }; } catch (e) { if (pedida) return { vencida: true }; }
+  }
+  return null;
 }
 
 /**
@@ -39,14 +66,10 @@ function cerrarSesion(res) {
  * a alguien o le cambia el rol, el cambio se aplica de inmediato.
  */
 async function requiereSesion(req, res, next) {
-  const token = leerCookie(req, COOKIE);
-  if (!token) return res.status(401).json({ error: "Debes iniciar sesión." });
-  let p;
-  try {
-    p = jwt.verify(token, config.jwtSecret);
-  } catch (e) {
-    return res.status(401).json({ error: "La sesión venció. Inicia sesión de nuevo." });
-  }
+  const leido = leerToken(req);
+  if (!leido) return res.status(401).json({ error: "Debes iniciar sesión." });
+  if (leido.vencida) return res.status(401).json({ error: "La sesión venció. Inicia sesión de nuevo." });
+  const p = leido.payload;
 
   if (p.tipo === "cliente") {
     const c = await db.one("SELECT id_cliente, nombre_empresa FROM cliente WHERE id_cliente = ?", [p.id_cliente]);

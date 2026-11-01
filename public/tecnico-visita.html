@@ -36,11 +36,25 @@
           </div>
         </div>
         <div>
+          <button class="acordeon-boton" aria-expanded="false" aria-controls="panel-zonas">Zonas del cliente</button>
+          <div class="acordeon-panel" id="panel-zonas">
+            <div class="campo">
+              <label for="zona-nueva">Crea las zonas del lugar (ej: cocina, bodega, oficinas)</label>
+              <small>Puedes escribir varias separadas por coma. Quedan guardadas para las siguientes visitas a este cliente y se eligen en «Productos utilizados».</small>
+              <ul id="lista-zonas" class="chips-zonas"></ul>
+              <div class="fila-agregar">
+                <input type="text" id="zona-nueva" maxlength="600" placeholder="Ej: Cocina, Bodega, Oficinas" autocomplete="off">
+                <button type="button" class="btn btn-secundario" id="btn-agregar-zona">Agregar zona</button>
+              </div>
+              <p class="mensaje-error"></p>
+            </div>
+          </div>
+        </div>
+        <div>
           <button class="acordeon-boton" aria-expanded="false" aria-controls="panel-productos">Productos utilizados</button>
           <div class="acordeon-panel" id="panel-productos">
             <p class="ayuda" style="margin-bottom:.7rem">Productos asignados por el administrador. Registra el lote, la zona donde se aplicó y la especie tratada.</p>
             <ul id="lista-productos" class="lista-productos-tecnico"></ul>
-            <datalist id="lista-especies"></datalist>
           </div>
         </div>
         <div>

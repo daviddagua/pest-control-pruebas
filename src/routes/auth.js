@@ -26,7 +26,7 @@ router.post("/login", async (req, res) => {
 
   const admin = u.nombre_rol === "Administrador";
   if (!admin && !u.id_tecnico) throw new HttpError(403, "Tu cuenta no tiene un perfil de técnico.");
-  iniciarSesion(res, { tipo: "usuario", id_usuario: u.id_usuario });
+  iniciarSesion(res, { tipo: "usuario", id_usuario: u.id_usuario }, admin ? "admin" : "tecnico");
   res.json({
     rol: admin ? "admin" : "tecnico",
     rolTexto: admin ? "Administrador" : "Técnico",
@@ -67,12 +67,12 @@ router.post("/cliente", async (req, res) => {
   if (!/^[A-Za-z0-9_-]{6,40}$/.test(token)) throw new HttpError(401, "El enlace no es válido.");
   const c = await db.one("SELECT id_cliente, nombre_empresa FROM cliente WHERE token_acceso = ?", [token]);
   if (!c) throw new HttpError(401, "El enlace no es válido.");
-  iniciarSesion(res, { tipo: "cliente", id_cliente: c.id_cliente });
+  iniciarSesion(res, { tipo: "cliente", id_cliente: c.id_cliente }, "cliente");
   res.json({ rol: "cliente", rolTexto: "Cliente", nombre: c.nombre_empresa, clienteId: c.id_cliente });
 });
 
 router.post("/logout", (req, res) => {
-  cerrarSesion(res);
+  cerrarSesion(req, res);
   res.json({ ok: true });
 });
 

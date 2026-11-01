@@ -1,4 +1,4 @@
-// Crea la base de datos "pestcontrol" y sus 10 tablas leyendo db/schema.sql.
+// Crea la base de datos "pestcontrol" y sus tablas leyendo db/schema.sql.
 //   npm run setup-db            -> crea lo que falte (no borra nada)
 //   npm run setup-db -- --reset -> BORRA la base y la crea de nuevo
 const fs = require("fs");

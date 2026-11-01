@@ -121,9 +121,15 @@ async function construirDatos(usuario) {
     clientesSql += " WHERE id_cliente IN (?)"; clientesParams = [idsCli.length ? idsCli : [0]];
   }
   if (esCli) { clientesSql += " WHERE id_cliente = ?"; clientesParams = [usuario.id_cliente]; }
-  const clientes = (await db.query(clientesSql + " ORDER BY id_cliente", clientesParams)).map((c) => ({
+  const filasCli = await db.query(clientesSql + " ORDER BY id_cliente", clientesParams);
+  // Zonas del lugar de cada cliente (las crea el técnico en la visita)
+  const zonas = filasCli.length ? await db.query(
+    "SELECT id_zona, id_cliente, nombre FROM cliente_zona WHERE id_cliente IN (?) ORDER BY nombre",
+    [filasCli.map((c) => c.id_cliente)]) : [];
+  const clientes = filasCli.map((c) => ({
     id: c.id_cliente, nombre: c.nombre_empresa, tipo: c.tipo, documento: c.documento,
-    telefono: c.telefono || "", correo: c.correo, direccion: c.direccion
+    telefono: c.telefono || "", correo: c.correo, direccion: c.direccion,
+    zonas: zonas.filter((z) => z.id_cliente === c.id_cliente).map((z) => ({ id: z.id_zona, nombre: z.nombre }))
   }));
 
   // --- Técnicos ---

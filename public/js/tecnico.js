@@ -181,22 +181,6 @@ function pantallaDetalle() {
      Los asigna el administrador (producto + dosis). El técnico solo
      registra el lote, la zona donde se aplicó y la especie tratada. */
 
-  // Sugerencias de especies según los servicios de la orden (el técnico puede escribir otra)
-  const ESPECIES = {
-    "cucaracha": ["Blattella germanica", "Periplaneta americana"],
-    "roedor": ["Rattus norvegicus", "Rattus rattus", "Mus musculus"],
-    "cebadera": ["Rattus norvegicus", "Rattus rattus", "Mus musculus"],
-    "hormiga": ["Solenopsis sp.", "Monomorium pharaonis", "Tapinoma melanocephalum"],
-    "termita": ["Cryptotermes brevis", "Nasutitermes sp.", "Coptotermes sp."],
-    "mosquito": ["Aedes aegypti", "Culex quinquefasciatus"],
-    "mosca": ["Musca domestica", "Drosophila melanogaster"],
-    "chinche": ["Cimex lectularius"]
-  };
-  const textoOrden = textoServicios(orden).toLowerCase();
-  let sugeridas = Object.keys(ESPECIES).filter(k => textoOrden.includes(k)).flatMap(k => ESPECIES[k]);
-  if (!sugeridas.length) sugeridas = Object.values(ESPECIES).flat();
-  el("lista-especies").innerHTML = [...new Set(sugeridas)].map(e => `<option value="${e}">`).join("");
-
   // Ficha de seguridad que subió el administrador (solo con la orden abierta)
   function fichaDelProducto(prod) {
     if (!prod || !prod.ficha) {
@@ -225,6 +209,73 @@ function pantallaDetalle() {
     }
   });
 
+  /*Zonas del cliente: el técnico las crea y luego las elige en cada producto.
+     En el producto se guardan como texto ("Cocina, Bodega"), así el certificado no cambia. */
+  const zonasCliente = () => (buscarCliente(orden.clienteId) || {}).zonas || [];
+  const separarZonas = texto => (texto || "").split(",").map(z => z.trim()).filter(Boolean);
+
+  function pintarZonas() {
+    const zonas = zonasCliente();
+    el("lista-zonas").innerHTML = zonas.length
+      ? zonas.map(z => `<li>${seguro(z.nombre)}
+          <button type="button" data-quitar-zona="${z.id}" aria-label="Quitar la zona ${seguro(z.nombre)}" title="Quitar zona">×</button></li>`).join("")
+      : `<li class="ayuda">Aún no hay zonas creadas para este cliente.</li>`;
+  }
+
+  // Desplegable con casillas: se pueden marcar varias zonas por producto
+  function selectorZonas(p, i) {
+    const elegidas = separarZonas(p.zona);
+    // Las zonas ya escritas que no están en la lista del cliente se siguen mostrando para no perderlas
+    const opciones = [...new Set([...zonasCliente().map(z => z.nombre), ...elegidas])];
+    const resumen = elegidas.length ? elegidas.join(", ") : "Selecciona las zonas";
+    return `<details class="selector-zonas" id="zona-${i}">
+        <summary aria-labelledby="zona-etiqueta-${i}">${seguro(resumen)}</summary>
+        <div class="opciones-zonas">${opciones.length
+          ? opciones.map(z => `<label class="casilla"><input type="checkbox" data-zona-producto="${i}" value="${seguro(z)}"
+              ${elegidas.includes(z) ? "checked" : ""}> ${seguro(z)}</label>`).join("")
+          : `<p class="ayuda">Primero crea las zonas en la sección «Zonas del cliente».</p>`}</div>
+      </details>`;
+  }
+
+  async function agregarZona() {
+    const caja = el("zona-nueva");
+    const nombre = caja.value.trim();   // puede traer varias separadas por coma
+    quitarError(caja);
+    if (!separarZonas(nombre).length) { marcarError(caja, "Escribe el nombre de la zona."); caja.focus(); return; }
+    const boton = el("btn-agregar-zona");
+    boton.disabled = true;
+    try {
+      const r = await api("POST", "/ordenes/" + numeroOrden + "/zonas", { nombre });
+      buscarCliente(orden.clienteId).zonas = r.zonas;
+      caja.value = "";
+      pintarZonas();
+      pintarProductos();
+    } catch (err) {
+      marcarError(caja, err.message);
+    } finally {
+      boton.disabled = false;
+    }
+  }
+
+  el("btn-agregar-zona").addEventListener("click", agregarZona);
+  el("zona-nueva").addEventListener("keydown", e => {
+    if (e.key === "Enter") { e.preventDefault(); agregarZona(); }
+  });
+  el("lista-zonas").addEventListener("click", async e => {
+    const boton = e.target.closest("[data-quitar-zona]");
+    if (!boton) return;
+    const zona = zonasCliente().find(z => z.id === Number(boton.dataset.quitarZona));
+    if (!zona || !confirm(`¿Quitar la zona «${zona.nombre}» de este cliente?`)) return;
+    try {
+      const r = await api("DELETE", "/ordenes/" + numeroOrden + "/zonas/" + zona.id);
+      buscarCliente(orden.clienteId).zonas = r.zonas;
+      pintarZonas();
+      pintarProductos();
+    } catch (err) {
+      errorApi(err);
+    }
+  });
+
   function pintarProductos() {
     el("lista-productos").innerHTML = orden.productos.length
       ? orden.productos.map((p, i) => {
@@ -248,13 +299,13 @@ function pantallaDetalle() {
               </div>
               <div class="campo">
                 <label for="especie-${i}">Especie tratada</label>
-                <input type="text" id="especie-${i}" data-producto="${i}" data-dato="especie" value="${seguro(p.especie || "")}" list="lista-especies" placeholder="Ej: Blattella germanica" autocomplete="off">
+                <input type="text" id="especie-${i}" data-producto="${i}" data-dato="especie" value="${seguro(p.especie || "")}" placeholder="Escribe la especie tratada" autocomplete="off">
                 <p class="mensaje-error"></p>
               </div>
             </div>
             <div class="campo">
-              <label for="zona-${i}">Zona(s) donde se aplicó <span class="obligatorio" aria-hidden="true">*</span></label>
-              <input type="text" id="zona-${i}" data-producto="${i}" data-dato="zona" value="${seguro(p.zona || "")}" placeholder="Ej: cocina, desagües y bodega" autocomplete="off">
+              <p class="etiqueta-grupo" id="zona-etiqueta-${i}">Zona(s) donde se aplicó <span class="obligatorio" aria-hidden="true">*</span></p>
+              ${selectorZonas(p, i)}
               <p class="mensaje-error"></p>
             </div>
           </li>`;
@@ -263,6 +314,18 @@ function pantallaDetalle() {
   }
 
   // Se guarda mientras el técnico escribe
+  el("lista-productos").addEventListener("change", e => {
+    const casilla = e.target;
+    if (casilla.dataset.zonaProducto === undefined) return;
+    const i = Number(casilla.dataset.zonaProducto);
+    const selector = el("zona-" + i);
+    const elegidas = [...selector.querySelectorAll("input:checked")].map(c => c.value);
+    orden.productos[i].zona = elegidas.join(", ");
+    selector.querySelector("summary").textContent = elegidas.length ? orden.productos[i].zona : "Selecciona las zonas";
+    if (elegidas.length) quitarError(selector);
+    programarGuardado({ productos: productosParaGuardar() });
+  });
+
   el("lista-productos").addEventListener("input", e => {
     const campo = e.target;
     if (!campo.dataset.producto) return;
@@ -275,15 +338,19 @@ function pantallaDetalle() {
   // Antes de finalizar: lote y zona son obligatorios en cada producto
   function productosCompletos() {
     let primero = null;
-    el("lista-productos").querySelectorAll("[data-dato='lote'], [data-dato='zona']").forEach(campo => {
+    el("lista-productos").querySelectorAll("[data-dato='lote']").forEach(campo => {
       quitarError(campo);
-      let mensaje = "";
       if (!campo.value.trim()) {
-        mensaje = campo.dataset.dato === "lote" ? "Escribe el lote del producto." : "Escribe dónde se aplicó.";
-      }
-      if (mensaje) {
-        marcarError(campo, mensaje);
+        marcarError(campo, "Escribe el lote del producto.");
         primero = primero || campo;
+      }
+    });
+    orden.productos.forEach((p, i) => {
+      const selector = el("zona-" + i);
+      quitarError(selector);
+      if (!separarZonas(p.zona).length) {
+        marcarError(selector, "Selecciona al menos una zona donde se aplicó.");
+        primero = primero || selector.querySelector("summary");
       }
     });
     return primero;
@@ -444,7 +511,7 @@ function pantallaDetalle() {
   function habilitarRegistro(habilitar) {
     document.querySelectorAll("#acordeon .acordeon-panel input, #acordeon .acordeon-panel select, #acordeon .acordeon-panel textarea, #acordeon .acordeon-panel button")
       .forEach(control => {
-        if (control.closest("#lista-documentos") || control.closest(".ficha-producto")) return;
+        if (control.closest("#lista-documentos") || control.closest(".ficha-producto") || control.closest("#panel-zonas")) return;
         control.disabled = !habilitar;
       });
   }
@@ -468,8 +535,12 @@ function pantallaDetalle() {
   function pintarEstado() {
     detenerIntervalo();
     pintarTiempos();
+    pintarZonas();
     pintarProductos();
     pintarDocumentos();
+    // Las zonas del cliente se pueden crear en cualquier momento mientras la orden esté abierta
+    const zonasAbiertas = ["Programado", "En ejecución"].includes(orden.estado);
+    el("panel-zonas").querySelectorAll("input, button").forEach(c => c.disabled = !zonasAbiertas);
     const avisoEstado = el("aviso-estado");
     el("botones-inicio").hidden = orden.estado !== "Programado";
     el("botones-trabajo").hidden = orden.estado !== "En ejecución";

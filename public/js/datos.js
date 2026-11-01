@@ -34,14 +34,21 @@ class ErrorApi extends Error {
 }
 
 /* Cliente de la API. La sesión viaja en una cookie segura (HttpOnly) que el navegador envía solo.
-   El encabezado X-Requested-With protege contra peticiones falsas desde otros sitios. */
+   El encabezado X-Requested-With protege contra peticiones falsas desde otros sitios.
+   X-Sesion indica qué sesión usa esta pestaña (admin, tecnico o cliente): cada rol tiene su propia
+   cookie, así el administrador y el técnico pueden estar abiertos a la vez en el mismo navegador. */
 async function api(metodo, url, cuerpo, { sinRedireccion = false } = {}) {
   let respuesta;
+  const sesion = document.body && document.body.dataset.rol;
   try {
     respuesta = await fetch("/api" + url, {
       method: metodo,
       credentials: "same-origin",
-      headers: { "X-Requested-With": "pestcontrol", ...(cuerpo !== undefined ? { "Content-Type": "application/json" } : {}) },
+      headers: {
+        "X-Requested-With": "pestcontrol",
+        ...(sesion ? { "X-Sesion": sesion } : {}),
+        ...(cuerpo !== undefined ? { "Content-Type": "application/json" } : {})
+      },
       body: cuerpo !== undefined ? JSON.stringify(cuerpo) : undefined
     });
   } catch (e) {

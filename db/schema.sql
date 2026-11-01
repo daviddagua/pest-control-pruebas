@@ -223,3 +223,15 @@ CREATE TABLE IF NOT EXISTS aviso (
     CONSTRAINT fk_aviso_cliente FOREIGN KEY (id_cliente) REFERENCES cliente(id_cliente)
         ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB;
+
+-- 14. cliente_zona: zonas del lugar del cliente (cocina, bodega...). Las crea el técnico
+-- durante la visita y quedan guardadas para las siguientes órdenes del mismo cliente.
+CREATE TABLE IF NOT EXISTS cliente_zona (
+    id_zona     INT AUTO_INCREMENT,
+    id_cliente  INT NOT NULL,
+    nombre      VARCHAR(60) NOT NULL,
+    PRIMARY KEY (id_zona),
+    CONSTRAINT uq_zona_cliente UNIQUE (id_cliente, nombre),
+    CONSTRAINT fk_zona_cliente FOREIGN KEY (id_cliente) REFERENCES cliente(id_cliente)
+        ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB;

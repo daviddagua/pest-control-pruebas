@@ -330,6 +330,41 @@ router.put("/:numero/progreso", TECNICO, async (req, res) => {
   res.json({ ok: true });
 });
 
+// Zonas del cliente (cocina, bodega...): el técnico las crea durante la visita y quedan
+// guardadas en el cliente para usarlas en cada producto y en sus siguientes órdenes.
+async function zonasDelCliente(idCliente) {
+  return (await db.query("SELECT id_zona, nombre FROM cliente_zona WHERE id_cliente = ? ORDER BY nombre", [idCliente]))
+    .map((z) => ({ id: z.id_zona, nombre: z.nombre }));
+}
+
+router.post("/:numero/zonas", TECNICO, async (req, res) => {
+  const s = await buscarOrden(req.params.numero);
+  exigirDueno(req, s);
+  exigirEstado(s, "programado", "en_proceso");
+  // Varias zonas separadas por coma: "Cocina, Bodega, Oficinas" crea tres zonas
+  const nombres = texto(req.body.nombre, "zona", 600).split(",").map((z) => z.trim().replace(/\s+/g, " ")).filter(Boolean);
+  if (!nombres.length) throw bad("Escribe el nombre de la zona.");
+  const largo = nombres.find((z) => z.length > 60);
+  if (largo) throw bad("La zona «" + largo.slice(0, 20) + "…» no puede pasar de 60 caracteres.");
+  await db.transaction(async (c) => {
+    const [existentes] = await c.query("SELECT nombre FROM cliente_zona WHERE id_cliente = ? FOR UPDATE", [s.id_cliente]);
+    const ya = new Set(existentes.map((z) => z.nombre.toLowerCase()));
+    const nuevas = nombres.filter((z) => !ya.has(z.toLowerCase()) && ya.add(z.toLowerCase()));   // también quita repetidas en lo escrito
+    if (!nuevas.length) throw conflict(nombres.length > 1 ? "Esas zonas ya existen para este cliente." : "La zona «" + nombres[0] + "» ya existe para este cliente.");
+    if (existentes.length + nuevas.length > 100) throw bad("Cada cliente admite máximo 100 zonas.");
+    await c.query("INSERT INTO cliente_zona (id_cliente, nombre) VALUES ?", [nuevas.map((z) => [s.id_cliente, z])]);
+  });
+  res.json({ zonas: await zonasDelCliente(s.id_cliente) });
+});
+
+router.delete("/:numero/zonas/:id", TECNICO, async (req, res) => {
+  const s = await buscarOrden(req.params.numero);
+  exigirDueno(req, s);
+  exigirEstado(s, "programado", "en_proceso");
+  await db.query("DELETE FROM cliente_zona WHERE id_zona = ? AND id_cliente = ?", [entero(req.params.id, "zona"), s.id_cliente]);
+  res.json({ zonas: await zonasDelCliente(s.id_cliente) });
+});
+
 router.post("/:numero/evidencias", TECNICO, async (req, res) => {
   const s = await buscarOrden(req.params.numero);
   exigirDueno(req, s);
