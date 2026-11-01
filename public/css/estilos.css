@@ -12,7 +12,7 @@
   --alerta-claro: #fdf3dc;
   --error: #C0392B;       /* estados críticos, cancelar */
   --error-claro: #fbe7e4;
-  --gris: #6b7390;
+  --gris: #464e6b;       /* texto secundario: oscuro para que se lea sobre el vidrio y el fondo */
   --texto: #1b2340;
   --radio: 10px;
   --sombra: 0 2px 10px rgba(16, 27, 61, .07);
@@ -673,8 +673,8 @@ fieldset { min-width: 0; }
 
 /* ---------- 25. Transparencia (va al final para que no la pisen los estilos de arriba) ---------- */
 :root {
-    --vidrio: rgba(255, 255, 255, 0.55);      /* ← transparencia de las tarjetas (menor = más transparente) */
-    --vidrio-menu: rgba(255, 255, 255, 0.45); /* ← transparencia de la barra izquierda */
+    --vidrio: rgba(255, 255, 255, 0.72);      /* ← transparencia de las tarjetas (menor = más transparente) */
+    --vidrio-menu: rgba(255, 255, 255, 0.65); /* ← transparencia de la barra izquierda */
     --vidrio-borde: rgba(255, 255, 255, 0.6);
 }
 
@@ -717,7 +717,7 @@ tbody tr:hover td { background: rgba(255, 255, 255, 0.5); }
 /* ---------- 26. Legibilidad de los textos sobre la imagen de fondo ---------- */
 /* Los títulos y subtítulos que quedan fuera de las tarjetas llevan un vidrio claro detrás y letra más oscura */
 .encabezado-pagina {
-    background: rgba(255, 255, 255, 0.55);
+    background: rgba(255, 255, 255, 0.72);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
     border: 1px solid rgba(255, 255, 255, 0.6);

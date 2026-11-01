@@ -510,78 +510,56 @@ function pantallaDetalle() {
     }
     el("btn-empezar").disabled = false;
     el("btn-empezar").textContent = "Empezar trabajo";
-    el("error-ubicacion").hidden = true;
-    el("btn-ubicacion-prueba").hidden = true;
     mostrarAviso(mensaje);
     pintarEstado();
   }
 
-  // Muestra el error de ubicación y ofrece el modo de prueba (para portátiles sin GPS)
-  function falloUbicacion(texto) {
-    const boton = el("btn-empezar");
-    el("error-ubicacion").textContent = texto;
-    el("error-ubicacion").hidden = false;
-    el("btn-ubicacion-prueba").hidden = false;
-    boton.disabled = false;
-    boton.textContent = "Reintentar: empezar trabajo";
-  }
-
-  /* Modo de prueba: solo aparece si falla la ubicación real. Queda marcado en el certificado. */
-  el("btn-ubicacion-prueba").addEventListener("click", () => {
-    if (!confirm("Se usará una ubicación SIMULADA y quedará marcada como \"ubicación de prueba\" en el certificado.\n\nÚsala solo para demostraciones. ¿Continuar?")) return;
-    iniciarVisita(
-      { lat: "2.44189", lon: "-76.60631", precision: null, prueba: true },
-      "Visita iniciada con ubicación de prueba (demostración)."
-    );
-  });
-
-  /* Empezar trabajo: se registran la hora de inicio y la ubicación GPS (obligatoria).
-     Si no se obtiene la ubicación, la visita no inicia. */
+  /* Empezar trabajo: se registra la hora de inicio y, si el dispositivo la entrega, la ubicación GPS.
+     La ubicación es opcional: si no se obtiene, la visita inicia igual sin ella. */
   el("btn-empezar").addEventListener("click", () => {
     const boton = el("btn-empezar");
-    const errorUbicacion = el("error-ubicacion");
-    errorUbicacion.hidden = true;
 
-    if (!navigator.geolocation) {
-      falloUbicacion("⚠️ Este dispositivo no permite obtener la ubicación. No es posible iniciar la visita.");
+    // El navegador solo entrega la ubicación en https o en localhost; por http://IP no la da.
+    if (!window.isSecureContext || !navigator.geolocation) {
+      iniciarVisita(null, "Visita iniciada. Se registró la hora de inicio (sin ubicación).");
       return;
     }
 
     boton.disabled = true;
     boton.textContent = "📍 Obteniendo ubicación…";
 
-    // Si el técnico no responde al permiso de ubicación, el botón se libera a los 20 s
+    // Si la ubicación no llega a tiempo (o el técnico no responde al permiso), se inicia sin ella
     let respondio = false;
-    const limite = setTimeout(() => {
+    const sinUbicacion = () => {
       if (respondio) return;
       respondio = true;
-      falloUbicacion("⚠️ No se obtuvo la ubicación. Acepta el permiso de ubicación que muestra el navegador y vuelve a intentarlo. La ubicación es obligatoria.");
-    }, 20000);
+      clearTimeout(limite);
+      iniciarVisita(null, "Visita iniciada. Se registró la hora de inicio (sin ubicación).");
+    };
+    const limite = setTimeout(sinUbicacion, 30000);
 
+    const exito = pos => {
+      if (respondio) return;
+      respondio = true;
+      clearTimeout(limite);
+      iniciarVisita({
+        lat: pos.coords.latitude.toFixed(5),
+        lon: pos.coords.longitude.toFixed(5),
+        precision: Math.round(pos.coords.accuracy)
+      }, "Visita iniciada. Se registró la hora de inicio y tu ubicación.");
+    };
+
+    // 1.er intento con GPS (celular). Si falla y no es por permiso, se intenta con la
+    // ubicación por Wi-Fi/red, que es la que tienen los PC y portátiles.
     navigator.geolocation.getCurrentPosition(
-      pos => {
-        if (respondio) return;
-        respondio = true;
-        clearTimeout(limite);
-        iniciarVisita({
-          lat: pos.coords.latitude.toFixed(5),
-          lon: pos.coords.longitude.toFixed(5),
-          precision: Math.round(pos.coords.accuracy)
-        }, "Visita iniciada. Se registró la hora de inicio y tu ubicación.");
-      },
+      exito,
       error => {
         if (respondio) return;
-        respondio = true;
-        clearTimeout(limite);
-        const motivos = {
-          1: "Debes permitir el acceso a la ubicación en el navegador para iniciar la visita.",
-          2: "No se pudo determinar la ubicación. Activa el GPS e intenta de nuevo.",
-          3: "La ubicación tardó demasiado. Intenta de nuevo en un lugar con mejor señal."
-        };
-        falloUbicacion("⚠️ " + (motivos[error.code] || "No se pudo obtener la ubicación.") + " La ubicación es obligatoria.");
-        mostrarAviso("No se pudo iniciar: falta la ubicación.", "error");
+        if (error.code === 1) return sinUbicacion();
+        navigator.geolocation.getCurrentPosition(exito, sinUbicacion,
+          { enableHighAccuracy: false, timeout: 12000, maximumAge: 300000 });
       },
-      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+      { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
     );
   });
 

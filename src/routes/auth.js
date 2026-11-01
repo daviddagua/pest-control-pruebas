@@ -20,7 +20,7 @@ router.post("/login", async (req, res) => {
        FROM usuario u JOIN rol r ON r.id_rol = u.id_rol
        LEFT JOIN tecnico t ON t.id_usuario = u.id_usuario
       WHERE u.correo = ?`, [correo]);
-  const correcta = (clave === u.contrasena);
+  const correcta = await bcrypt.compare(clave, u ? u.contrasena : HASH_FALSO);
   if (!u || !correcta) throw new HttpError(401, "El usuario o la contraseña no son correctos.");
   if (u.estado !== "activo") throw new HttpError(403, "Tu cuenta está inactiva.");
 

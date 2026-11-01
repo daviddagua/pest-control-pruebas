@@ -235,13 +235,17 @@ router.post("/:numero/cancelar", async (req, res) => {
 /* ---------- TÉCNICO: la visita ---------- */
 
 router.post("/:numero/iniciar", TECNICO, async (req, res) => {
-  const g = req.body.gps || {};
-  const lat = Number(g.lat), lon = Number(g.lon);
-  if (!Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180) {
-    throw bad("La ubicación es obligatoria para iniciar la visita.");
+  // La ubicación es opcional: si el navegador no la entrega, la visita inicia sin ella.
+  const g = req.body.gps || null;
+  let lat = null, lon = null, precision = null;
+  if (g) {
+    lat = Number(g.lat); lon = Number(g.lon);
+    if (!Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180) {
+      throw bad("La ubicación no es válida.");
+    }
+    precision = g.precision === null || g.precision === undefined ? null : Math.round(Number(g.precision));
+    if (precision !== null && (!Number.isFinite(precision) || precision < 0 || precision > 1e6)) throw bad("La precisión de la ubicación no es válida.");
   }
-  const precision = g.precision === null || g.precision === undefined ? null : Math.round(Number(g.precision));
-  if (precision !== null && (!Number.isFinite(precision) || precision < 0 || precision > 1e6)) throw bad("La precisión de la ubicación no es válida.");
   await db.transaction(async (c) => {
     const s = await buscarOrden(req.params.numero, c);
     exigirDueno(req, s);
@@ -250,7 +254,7 @@ router.post("/:numero/iniciar", TECNICO, async (req, res) => {
     await c.query(
       `UPDATE servicio SET estado='en_proceso', fecha_ejecucion=COALESCE(fecha_ejecucion, ?), reanudado_en=?, pausado=0,
          gps_lat=?, gps_lon=?, gps_precision=?, gps_prueba=? WHERE id_servicio=?`,
-      [mysqlFecha(ahora), mysqlFecha(ahora), lat, lon, precision, g.prueba ? 1 : 0, s.id_servicio]);
+      [mysqlFecha(ahora), mysqlFecha(ahora), lat, lon, precision, g && g.prueba ? 1 : 0, s.id_servicio]);
   });
   res.json({ ok: true });
 });

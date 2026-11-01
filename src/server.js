@@ -21,7 +21,9 @@ app.use(helmet({
       connectSrc: ["'self'"],
       objectSrc: ["'none'"],
       frameAncestors: ["'none'"],
-      formAction: ["'self'"]
+      formAction: ["'self'"],
+      // El servidor atiende por http: si se pide pasar a https, el celular (por la IP de la red) no carga nada.
+      upgradeInsecureRequests: null
     }
   }
 }));
