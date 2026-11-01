@@ -340,7 +340,7 @@ async function zonasDelCliente(idCliente) {
 router.post("/:numero/zonas", TECNICO, async (req, res) => {
   const s = await buscarOrden(req.params.numero);
   exigirDueno(req, s);
-  exigirEstado(s, "programado", "en_proceso");
+  exigirEstado(s, "en_proceso");
   // Varias zonas separadas por coma: "Cocina, Bodega, Oficinas" crea tres zonas
   const nombres = texto(req.body.nombre, "zona", 600).split(",").map((z) => z.trim().replace(/\s+/g, " ")).filter(Boolean);
   if (!nombres.length) throw bad("Escribe el nombre de la zona.");
@@ -360,7 +360,7 @@ router.post("/:numero/zonas", TECNICO, async (req, res) => {
 router.delete("/:numero/zonas/:id", TECNICO, async (req, res) => {
   const s = await buscarOrden(req.params.numero);
   exigirDueno(req, s);
-  exigirEstado(s, "programado", "en_proceso");
+  exigirEstado(s, "en_proceso");
   await db.query("DELETE FROM cliente_zona WHERE id_zona = ? AND id_cliente = ?", [entero(req.params.id, "zona"), s.id_cliente]);
   res.json({ zonas: await zonasDelCliente(s.id_cliente) });
 });

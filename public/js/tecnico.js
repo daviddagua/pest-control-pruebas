@@ -511,7 +511,7 @@ function pantallaDetalle() {
   function habilitarRegistro(habilitar) {
     document.querySelectorAll("#acordeon .acordeon-panel input, #acordeon .acordeon-panel select, #acordeon .acordeon-panel textarea, #acordeon .acordeon-panel button")
       .forEach(control => {
-        if (control.closest("#lista-documentos") || control.closest(".ficha-producto") || control.closest("#panel-zonas")) return;
+        if (control.closest("#lista-documentos") || control.closest(".ficha-producto")) return;
         control.disabled = !habilitar;
       });
   }
@@ -538,9 +538,6 @@ function pantallaDetalle() {
     pintarZonas();
     pintarProductos();
     pintarDocumentos();
-    // Las zonas del cliente se pueden crear en cualquier momento mientras la orden esté abierta
-    const zonasAbiertas = ["Programado", "En ejecución"].includes(orden.estado);
-    el("panel-zonas").querySelectorAll("input, button").forEach(c => c.disabled = !zonasAbiertas);
     const avisoEstado = el("aviso-estado");
     el("botones-inicio").hidden = orden.estado !== "Programado";
     el("botones-trabajo").hidden = orden.estado !== "En ejecución";
